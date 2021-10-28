@@ -37,8 +37,6 @@ DynString tkstr,sourcestr;
 int tkvalue;
 
 
-
-
 /*单词编码*/
 enum e_Token_Code
 {
