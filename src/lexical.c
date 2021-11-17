@@ -1,163 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "head\utils.h"
+#include "../head/lexical.h"
 
 //词法分析器
-
-/*******************************************
- *  初始化动态字符串存储容量
- *  pstr:动态字符串存储结构
- *  initsize:字符串初始化分配空间
- ********************************************/
-void dynstring_init(DynString *pstr, int initsize)
-{
-    if (pstr != NULL)
-    {
-        pstr->data = (char *)malloc(sizeof(char) * initsize);
-        pstr->count = 0;
-        pstr->capacity = initsize;
-    }
-}
-
-/*******************************************
- *  释放动态字符串的内存空间
- *  pstr:动态字符串存储结构
- ********************************************/
-void dynstring_free(DynString *pstr)
-{
-    if (pstr != NULL)
-    {
-        if (pstr->data)
-            free(pstr->data);
-        pstr->count = 0;
-        pstr->capacity = 0;
-    }
-}
-
-/*******************************************
- *  重置动态字符串，先释放，重新初始化
- *  pstr:动态字符串存储结构
- ********************************************/
-void dynstring_reset(DynString *pstr)
-{
-    dynstring_free(pstr);
-    dynstring_init(pstr, 8); //字符串初始化分配空间8字节
-}
-
-/*******************************************
- *  重新分配字符串容量
- *  pstr:动态字符串存储结构
- *  new_size:字符串新长度
- ********************************************/
-void dynstring_realloc(DynString *pstr, int new_size)
-{
-    int capacity;
-    char *data;
-
-    capacity = pstr->capacity;
-    while (capacity < new_size)
-        capacity = capacity * 2;
-    data = realloc(pstr->data, capacity);
-    if (!data)
-        error("Memory allocation failed");
-    pstr->capacity = capacity;
-    pstr->data = data;
-}
-
-/*******************************************
- *  追加单个字符到动态字符串对象
- *  pstr:动态字符串存储结构
- *  ch:所要追加的字符(原int)
- ********************************************/
-void dynstring_chcat(DynString *pstr, char ch)
-{
-    int count;
-    count = pstr->count + 1;
-    if (count > pstr->capacity)
-        dynstring_realloc(pstr, count);
-    ((char *)pstr->data)[count - 1] = ch;
-    pstr->count = count;
-}
-
-/*******************************************
- *  重新分配动态数组容量
- *  parr:动态数组存储结构
- *  new_size:动态数组最新元素个数
- ********************************************/
-void dynarray_realloc(DynArray *parr, int new_size)
-{
-    int capacity;
-    void *data;
-
-    capacity = parr->capacity;
-    while (capacity < new_size)
-        capacity *= 2;
-    data = realloc(parr->data, capacity);
-    if (!data)
-        error("Memory allocation failed");
-    parr->capacity = capacity;
-    parr->data = data;
-}
-
-/*******************************************
- *  追加动态数组元素
- *  parr:动态数组存储结构
- *  data:所要追加的新元素
- ********************************************/
-void dynarray_add(DynArray *parr, void *data)
-{
-    int count;
-    count = parr->count + 1;
-    if (count * sizeof(void *) > parr->capacity)
-        dynarray_realloc(parr, count * sizeof(void *));
-    parr->data[count - 1] = data;
-    parr->count = count;
-}
-
-/*******************************************
- *  初始化动态数组存储容量
- *  parr:动态数组存储结构
- *  initsize:动态数组初始化分配空间
- ********************************************/
-void dynarray_init(DynArray *parr, int initsize)
-{
-    if (parr != NULL)
-    {
-        parr->data = (void **)malloc(sizeof(char) * initsize);
-        parr->count = 0;
-        parr->capacity = initsize;
-    }
-}
-
-/*******************************************
- *  释放动态数组使用的内存空间
- *  parr:动态数组存储结构
- ********************************************/
-void dynarray_free(DynArray *parr)
-{
-    void **p;
-    for (p = parr->data; parr->count; ++p, --parr->count)
-        if (*p)
-            free(*p);
-    free(parr->data);
-    parr->data = NULL;
-}
-
-/*******************************************
- *  动态数组元素查找
- *  parr:动态数组存储结构
- *  key:要查找的元素
- ********************************************/
-int dynarray_search(DynArray *parr, int key)
-{
-    int i;
-    int **p;
-    p = (int **)parr->data;
-    for (i = 0; i < parr->count; ++i, p++)
-        if (key == **p)
-            return i;
-    return -1;
-}
 
 /*******************************************
   * 计算哈希地址
@@ -409,7 +254,7 @@ void skip(int c)
 
 /*******************************************
   * 功能:取得单词v所代表的源码字符串
-  * c:单词编号
+  * v:单词编号
  ********************************************/
 char *get_tkstr(int v)
 {
@@ -907,7 +752,7 @@ void color_token(int lex_state)
  ********************************************/
 int main(int argc, char **argv)
 {
-    fin = fopen("d:/compiler/lext.c", "rb");
+    fin = fopen(argv[1], "rb");
     if (!fin)
     {
         printf("can not open!\n");

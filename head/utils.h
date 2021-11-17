@@ -33,7 +33,7 @@ FILE *fin;
 char* filename;
 int line_num;
 
-DynString tkstr,sourcestr;
+DynString tkstr,sourcestr; //单词字符串, 单词源码字符串
 int tkvalue;
 
 /*单词编码*/
