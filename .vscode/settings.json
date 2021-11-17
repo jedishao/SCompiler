@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "utils.h": "c",
-        "dynarray.h": "c",
-        "stdlib.h": "c",
-        "stdio.h": "c",
-        "lex.h": "c"
-    }
-}
