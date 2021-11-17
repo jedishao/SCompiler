@@ -120,7 +120,6 @@ void* mallocz(int size);
 TKWord* tkword_direct_insert(TKWord *tp);
 TKWord* tkword_find(char *p, int keyno);
 TKWord* tkword_insert(char *p);
-void init_lex();
 void color_token(int lex_state);
 void handle_exception(int stage, int level, char *fmt, va_list ap);
 void warning(char *fmt, ...);
