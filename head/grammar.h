@@ -1,14 +1,14 @@
 #ifndef _GRAMMER_H
 #define _GRAMMER_H
 
-#include "lex.h"
+#include "lexical.h"
 
-int syntax_state;//�﷨״̬
-int syntax_level;
+int syntax_state; //语法状态
+int syntax_level; //缩进级别
 
 enum e_SynTaxState
 {
-	SNTX_NUL,//��״̬
+	SNTX_NUL, //空状态
 	SNTX_SP,
 	SNTX_LF_HT,
 	SNTX_DELAY
@@ -56,6 +56,5 @@ void primary_expression();
 void argument_expression_list();
 void syntax_indent();
 void print_tab(int n);
-
 
 #endif // !_YUFA_H
