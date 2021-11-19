@@ -12,6 +12,7 @@ syntax_level    控制缩进级别
 
 /*******************************************
  * <translation_unit>::={<external_declaration>}<TK_EOF>
+ * <翻译单元>::={<外部声明>}<文件结束符>
  ********************************************/
 void translation_unit()
 {
@@ -30,6 +31,11 @@ void translation_unit()
  *      |<type_specifier><init_declarator_list><TK_SEMICOLON>
  * <init_declarator_list>::=<init_declarator>{<TK_COMMA><init_declarator>}
  * <init_declarator>::=<declarator>{<TK_ASSIGN><initializer>}
+ * <外部声明>::=<函数定义>|<声明>
+ * <函数定义>::=<类型区分符><声明符><函数体>
+ * <声明>::=<类型区分符><分号>|<类型区分符><初值声明符表><分号>
+ * <初值声明符表>::=<初值声明符>{<逗号><初值声明符>}
+ * <初值声明符>::=<声明符>{<赋值运算符><初值符>}
  * 
  * 等价转换为LL(1)文法:
  * <external_declaration>::=
@@ -130,10 +136,14 @@ int type_specifier()
 }
 
 /*******************************************
+ * 结构区分符
+ * 
  * <struct_specifier>::=
- * <TK_STRUCT><IDENTIFIER><TK_BEGIN>
- * <struct_declaration_list><TK_END>|
- * <TK_STRUCT><IDENTIFIER>
+ *      <TK_STRUCT><IDENTIFIER><TK_BEGIN>
+ *      <struct_declaration_list><TK_END>|
+ *      <TK_STRUCT><IDENTIFIER>
+ * <结构区分符>::=<struct关键字><标识符>|
+ *      <struct关键字><标识符><左大括号><结构声明表><右大括号>
  ********************************************/
 void struct_specifier()
 {
@@ -146,7 +156,7 @@ void struct_specifier()
 
     if (token == TK_BEGIN) //适用于结构体定义
         syntax_state = SNTX_LF_HT;
-    else if (token == TK_CLOSEPA) //适用于sizeod(struct struct_name)
+    else if (token == TK_CLOSEPA) //适用于sizeof(struct struct_name)
         syntax_state = SNTX_NUL;
     else //适用于结构变量声明
         syntax_state = SNTX_SP;
@@ -162,8 +172,12 @@ void struct_specifier()
 }
 
 /*******************************************
+ * 结构声明表
+ * 
  * <struct_declaration_list>::=
  *      <struct_declaration>{<struct_declaration>}
+ * <结构声明表>::=
+ *      <结构声明>{<结构声明>}
  ********************************************/
 void struct_declaration_list()
 {
@@ -183,6 +197,8 @@ void struct_declaration_list()
 }
 
 /*******************************************
+ * 结构声明
+ * 
  * <struct_declaration>::=
  *      <type_specifier><struct_declarator_list><TK_SEMICOLON>*
  * <struct_declarator_list>::=<declarator>{<TK_COMMA><declarator>}
@@ -191,6 +207,7 @@ void struct_declaration_list()
  * <struct_declaration>::=
  *      <type_specifier><declarator>{<TK_COMMA><declarator>}
  *      <TK_SEMICOLON>
+ * <结构声明>::=<类型区分符><声明符>{<逗号><声明符>}<分号>
  ********************************************/
 void struct_declaration()
 {
@@ -209,6 +226,7 @@ void struct_declaration()
 
 /*******************************************
  *<function_calling_convention>::=<TK_CDECL>|<TK_STDCALL>
+ *<调用约定>::=<__cdecl关键字>|<__stdcall关键字>
  *用于函数声明上，用在数据声明上忽略掉
  ********************************************/
 void function_calling_convention(int *fc)
@@ -224,8 +242,11 @@ void function_calling_convention(int *fc)
 
 /*******************************************
  * 结构成员对齐
+ * 
  * <struct_member_alignment>::=<TK_ALIGN><TK_OPENPA>
  *            <TK_CLINET><TK_CLOSEPA>
+ * <结构成员对齐>::=<__align关键字><左小括号>
+ *            <整数常量><右小括号>
  ********************************************/
 void struct_member_alignment()
 {
@@ -238,7 +259,7 @@ void struct_member_alignment()
             get_token();
         }
         else
-            expect("integer");
+            expect("integer constant");
         skip(TK_CLOSEPA);
     }
 }
@@ -276,7 +297,7 @@ void direct_declarator()
         get_token();
     }
     else
-        expect("biaoshifu");
+        expect("identifier");
     direct_declarator_postfix();
 }
 
@@ -457,7 +478,7 @@ int is_type_specifier(int v)
 *******************************************/
 void expression_statement()
 {
-    if (token != token)
+    if (token != TK_SEMICOLON)
     {
         expression();
     }
@@ -466,7 +487,9 @@ void expression_statement()
 }
 
 /*******************************************
- * <if_statement>::=<TK_IF><TK_OPENPA><expression>
+ * 条件判断
+ * 
+ * <if_statement>::=<KW_IF><TK_OPENPA><expression>
  *      <TK_CLOSEPA><statement>[<KW_ELSE><statement>]
 *******************************************/
 void if_statement()
@@ -481,4 +504,28 @@ void if_statement()
     if (token == TK_ELSE)
     {
     }
+}
+
+/*******************************************
+ * for循环
+ * 
+ * <for_statement>::=<KW_FOR><TK_OPENPA><expression_statement>
+ *      <expression_statement><expression><TK_CLOSEPA><statement>
+*******************************************/
+void for_statement()
+{
+    get_token();
+    skip(TK_OPENPA);
+    if(token!=TK_SEMICOLON)
+    {
+        expression();
+    }
+    skip(TK_SEMICOLON);
+    if(token!=TK_CLOSEPA)
+    {
+        expression();
+    }
+    syntax_state=SNTX_LF_HT;
+    skip(TK_CLOSEPA);
+    statement();
 }

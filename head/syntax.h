@@ -11,7 +11,7 @@ enum e_SynTaxState
 	SNTX_NUL, //空状态
 	SNTX_SP,
 	SNTX_LF_HT,
-	SNTX_DELAY
+	SNTX_DELAY //延迟等待下一个单词
 };
 
 enum e_Filed
