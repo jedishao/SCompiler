@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "..\head\utils.h"
-#include "..\head\grammar.h"
+#include "..\head\syntax.h"
 
 /*语法分析*/
 
