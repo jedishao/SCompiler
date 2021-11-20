@@ -104,27 +104,27 @@ int type_specifier()
     int type_found = 0;
     switch (token)
     {
-    case TK_CHAR:
+    case KW_CHAR:
         type_found = 1;
         syntax_state = SNTX_SP;
         get_token();
         break;
-    case TK_SHORT:
+    case KW_SHORT:
         type_found = 1;
         syntax_state = SNTX_SP;
         get_token();
         break;
-    case TK_VOID:
+    case KW_VOID:
         type_found = 1;
         syntax_state = SNTX_SP;
         get_token();
         break;
-    case TK_INT:
+    case KW_INT:
         type_found = 1;
         syntax_state = SNTX_SP;
         get_token();
         break;
-    case TK_STRUCT:
+    case KW_STRUCT:
         type_found = 1;
         syntax_state = SNTX_SP;
         get_token();
@@ -231,8 +231,8 @@ void struct_declaration()
  ********************************************/
 void function_calling_convention(int *fc)
 {
-    *fc = TK_CDECL;
-    if (token == TK_CDECL || token == TK_STDCALL)
+    *fc = KW_CDECL;
+    if (token == KW_CDECL || token == KW_STDCALL)
     {
         *fc = token;
         syntax_state = SNTX_SP;
@@ -250,7 +250,7 @@ void function_calling_convention(int *fc)
  ********************************************/
 void struct_member_alignment()
 {
-    if (token == TK_ALIGN)
+    if (token == KW_ALIGN)
     {
         get_token();
         skip(TK_OPENPA);
@@ -357,7 +357,7 @@ void parameter_type_list(int func_call)
         skip(TK_COMMA);
         if (token == TK_ELLIPSIS)
         {
-            func_call = TK_CDECL;
+            func_call = KW_CDECL;
             get_token();
             break;
         }
@@ -406,19 +406,19 @@ void statement()
     case TK_BEGIN:
         compound_statement();
         break;
-    case TK_IF:
+    case KW_IF:
         if_statement();
         break;
-    case TK_RETURN:
+    case KW_RETURN:
         return_statement();
         break;
-    case TK_BREAK:
+    case KW_BREAK:
         break_statement();
         break;
-    case TK_CONTINUE:
+    case KW_CONTINUE:
         continue_statement();
         break;
-    case TK_FOR:
+    case KW_FOR:
         for_statement();
         break;
     default:
@@ -459,11 +459,11 @@ int is_type_specifier(int v)
 {
     switch (v)
     {
-    case TK_CHAR:
-    case TK_SHORT:
-    case TK_INT:
-    case TK_VOID:
-    case TK_STRUCT:
+    case KW_CHAR:
+    case KW_SHORT:
+    case KW_INT:
+    case KW_VOID:
+    case KW_STRUCT:
         return 1;
     default:
         break;
@@ -501,7 +501,7 @@ void if_statement()
     syntax_state = SNTX_LF_HT;
     skip(TK_CLOSEPA);
     statement();
-    if (token == TK_ELSE)
+    if (token == KW_ELSE)
     {
     }
 }
@@ -531,7 +531,7 @@ void for_statement()
 }
 
 /*******************************************
- * continue
+ * continue 语义上存在问题
  * 
  * <continue_statement>::=<KW_CONTINUE><TK_SEMICOLON>
 *******************************************/
@@ -598,7 +598,7 @@ void expression()
  * <assignment_expression>::=<equality_expression>
  *      |<unary_expression><TK_ASSIGN><assignment_expression>
  * 
- * 非等价变换后:
+ * 非等价变换后:(语义上存在问题)
  * <assignment_expression>::=<equality_expression>
  *      {<TK_ASSIGN>><assignment_expression>}
 *******************************************/
@@ -610,4 +610,218 @@ void assignment_expression()
         get_token();
         assignment_expression();
     }
+}
+
+/*******************************************
+ * 相等类表达式
+ * 
+ * <equality_expression>::=<relational_expression>
+ *      {<TK_EQ><relational_expression>
+ *      |<TK_NEQ><relational_expression>}
+*******************************************/
+void equality_expression()
+{
+    relational_expression();
+    while (token == TK_EQ || token == TK_NEQ)
+    {
+        get_token();
+        relational_expression();
+    }
+}
+
+/*******************************************
+ * 关系类表达式
+ * 
+ * <relational_expression>::=<additive_expression>
+ *      {<TK_LT><additive_expression>
+ *      |<TK_GT><additive_expression>
+ *      |<TK_LEQ><additive_expression>
+ *      |<TK_GEQ><additive_expression>}
+*******************************************/
+void relational_expression()
+{
+    additive_expression();
+    while ((token == TK_LT || token == TK_LEQ) ||
+           (token == TK_GT || token == TK_GEQ))
+    {
+        get_token();
+        additive_expression();
+    }
+}
+
+/*******************************************
+ * 加减类表达式
+ * 
+ * <additive_expression>::=<multiplication_expression>
+ *      {<TK_PLUS><multiplication_expression>
+ *      |<TK_MINUS><multiplication_expression>}
+*******************************************/
+void additive_expression()
+{
+    multiplication_expression();
+    while (token == TK_PLUS || token == TK_MINUS)
+    {
+        get_token();
+        multiplication_expression();
+    }
+}
+
+/*******************************************
+ * 乘除类表达式
+ * 
+ * <multiplication_expression>::=<unary_expression>
+ *      {<TK_STAR><unary_expression>
+ *      |<TK_DIVIDE><unary_expression>
+ *      |<TK_MOD><unary_expression>}
+*******************************************/
+void multiplication_expression()
+{
+    unary_expression();
+    while (token == TK_STAR || token == TK_DIVIDE || token == TK_MOD)
+    {
+        get_token();
+        unary_expression();
+    }
+}
+
+/*******************************************
+ * 一元类表达式
+ * 
+ * <unary_expression>::=<postfix_expression>
+ *      |<TK_AND><unary_expression>
+ *      |<TK_STAR><unary_expression>
+ *      |<TK_PLUS><unary_expression>
+ *      |<TK_MINUS><unary_expression>
+ *      |<sizeof_expression>
+*******************************************/
+void unary_expression()
+{
+    switch (token)
+    {
+    case TK_AND:
+        get_token();
+        unary_expression();
+        break;
+    case TK_STAR:
+        get_token();
+        unary_expression();
+        break;
+    case TK_PLUS:
+        get_token();
+        unary_expression();
+        break;
+    case TK_MINUS:
+        get_token();
+        unary_expression();
+        break;
+    case KW_SIZEOF:
+        sizeof_expression();
+        break;
+    default:
+        postfix_expression();
+        break;
+    }
+}
+
+/*******************************************
+ * sizeof
+ * 
+ * <sizeof_expression>::=
+ *      <KW_SIZEOF><TK_OPENPA><type_specifier><TK_CLOSEPA>
+*******************************************/
+void sizeof_expression()
+{
+    get_token();
+    skip(TK_OPENPA);
+    type_specifier();
+    skip(TK_CLOSEPA);
+}
+
+/*******************************************
+ * 后缀表达式
+ * 
+ * <postfix_expression>::=<primary_expression>
+ *      {<TK_OPENBR><expression><TK_CLOSEBR>
+ *      |<TK_OPENPA><TK_CLOSEPA>
+ *      |<TK_OPENPA><argument_expression_list><TK_CLOSEPA>
+ *      |<TK_DOT><IDENTIFIER>
+ *      |<TK_POINTSTO><IDENTIFIER>}
+*******************************************/
+void postfix_expression()
+{
+	primary_expression();
+	while (1)
+	{
+		if (token == TK_DOT || token == TK_POINTSTO)
+		{
+			get_token();
+		//	token |= SC_MEMBER;  //This is to check whether it is a member of the struct
+			get_token();
+		}
+		else if (token == TK_OPENBR)
+		{
+			get_token();
+			expression();
+			skip(TK_CLOSEBR);
+		}
+		else if (token == TK_OPENPA)
+			argument_expression_list();	
+		else
+			break;
+	}
+}
+
+/*******************************************
+ * 初值表达式
+ * 
+ * <primary_expression>::=<IDENTIFIER>
+ *      |<TK_CINT>
+ *      |<TK_CCHAR>
+ *      |<TK_CSTR>
+ *      |<TK_OPENPA><expression><TK_CLOSEPA>
+*******************************************/
+void primary_expression()
+{
+	int t;
+	switch (token)
+	{
+	case TK_CINT:
+	case TK_CCHAR:
+	case TK_CSTR:
+		get_token();
+		break;
+	case TK_OPENPA:
+		get_token();
+		expression();
+		skip(TK_CLOSEPA);
+		break;
+	default:
+		t = token;
+		get_token();
+		if (t < TK_IDENT)
+			expect("identifier or constant");
+		break;
+	}
+}
+
+/*******************************************
+ * 实参表达式表
+ * 
+ * <argument_expression_list>::=<argument_expression>
+ *      {<TK_COMMA><assignment_expression>}
+*******************************************/
+void argument_expression_list()
+{
+	get_token();
+	if (token != TK_CLOSEPA)
+	{
+		for (;;)
+		{
+			assignment_expression();
+			if (token == TK_CLOSEPA)
+				break;
+			skip(TK_COMMA);
+		}
+	}
+	skip(TK_CLOSEPA);
 }
