@@ -3,15 +3,15 @@
 
 #include "lexical.h"
 
-int syntax_state; //语法状态
-int syntax_level; //缩进级别
+int syntax_state; 	//语法状态
+int syntax_level; 	//缩进级别
 
 enum e_SynTaxState
 {
-	SNTX_NUL, //空状态
-	SNTX_SP,
-	SNTX_LF_HT,
-	SNTX_DELAY //延迟等待下一个单词
+	SNTX_NUL, 	//空状态, 没有语法缩进动作
+	SNTX_SP,	//空格
+	SNTX_LF_HT,	//换行并缩进, 每一个声明、函数定义、语句结束都要置为此状态
+	SNTX_DELAY	//延迟到取出下一个单词后确定输出格式
 };
 
 enum e_Filed

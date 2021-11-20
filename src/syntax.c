@@ -749,26 +749,26 @@ void sizeof_expression()
 *******************************************/
 void postfix_expression()
 {
-	primary_expression();
-	while (1)
-	{
-		if (token == TK_DOT || token == TK_POINTSTO)
-		{
-			get_token();
-		//	token |= SC_MEMBER;  //This is to check whether it is a member of the struct
-			get_token();
-		}
-		else if (token == TK_OPENBR)
-		{
-			get_token();
-			expression();
-			skip(TK_CLOSEBR);
-		}
-		else if (token == TK_OPENPA)
-			argument_expression_list();	
-		else
-			break;
-	}
+    primary_expression();
+    while (1)
+    {
+        if (token == TK_DOT || token == TK_POINTSTO)
+        {
+            get_token();
+            //	token |= SC_MEMBER;  //This is to check whether it is a member of the struct
+            get_token();
+        }
+        else if (token == TK_OPENBR)
+        {
+            get_token();
+            expression();
+            skip(TK_CLOSEBR);
+        }
+        else if (token == TK_OPENPA)
+            argument_expression_list();
+        else
+            break;
+    }
 }
 
 /*******************************************
@@ -782,26 +782,26 @@ void postfix_expression()
 *******************************************/
 void primary_expression()
 {
-	int t;
-	switch (token)
-	{
-	case TK_CINT:
-	case TK_CCHAR:
-	case TK_CSTR:
-		get_token();
-		break;
-	case TK_OPENPA:
-		get_token();
-		expression();
-		skip(TK_CLOSEPA);
-		break;
-	default:
-		t = token;
-		get_token();
-		if (t < TK_IDENT)
-			expect("identifier or constant");
-		break;
-	}
+    int t;
+    switch (token)
+    {
+    case TK_CINT:
+    case TK_CCHAR:
+    case TK_CSTR:
+        get_token();
+        break;
+    case TK_OPENPA:
+        get_token();
+        expression();
+        skip(TK_CLOSEPA);
+        break;
+    default:
+        t = token;
+        get_token();
+        if (t < TK_IDENT)
+            expect("identifier or constant");
+        break;
+    }
 }
 
 /*******************************************
@@ -812,16 +812,56 @@ void primary_expression()
 *******************************************/
 void argument_expression_list()
 {
-	get_token();
-	if (token != TK_CLOSEPA)
-	{
-		for (;;)
-		{
-			assignment_expression();
-			if (token == TK_CLOSEPA)
-				break;
-			skip(TK_COMMA);
-		}
-	}
-	skip(TK_CLOSEPA);
+    get_token();
+    if (token != TK_CLOSEPA)
+    {
+        for (;;)
+        {
+            assignment_expression();
+            if (token == TK_CLOSEPA)
+                break;
+            skip(TK_COMMA);
+        }
+    }
+    skip(TK_CLOSEPA);
+}
+
+/*******************************************
+ * 功能: 语法缩进
+*******************************************/
+void syntax_indent()
+{
+    switch (syntax_state)
+    {
+    case SNTX_NUL:
+        color_token(LEX_NORMAL);
+        break;
+    case SNTX_SP:
+        print(" ");
+        color_token(LEX_NORMAL);
+        break;
+    case SNTX_LF_HT:
+    {
+        if (token == TK_END)
+            syntax_level--;
+        printf("\n");
+        print_tab(syntax_level);
+    }
+        color_token(LEX_NORMAL);
+        break;
+    case SNTX_DELAY:
+        break;
+    }
+    syntax_state = SNTX_NUL;
+}
+
+/*******************************************
+ * 功能: 缩进n个tab
+ * n:    缩进个数
+*******************************************/
+void print_tab(int n)
+{
+    int i=0;
+    for(;i<n;i++)
+        printf("\t");
 }
