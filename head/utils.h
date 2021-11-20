@@ -72,22 +72,22 @@ enum e_Token_Code
     TK_CSTR,   //字符串常量
 
     /*关键字*/
-    TK_CHAR,     //char关键字
-    TK_SHORT,    //short关键字
-    TK_INT,      //int关键字
-    TK_VOID,     //void关键字
-    TK_STRUCT,   //struct关键字
-    TK_IF,       //if关键字
-    TK_ELSE,     //else关键字
-    TK_FOR,      //for关键字
-    TK_CONTINUE, //continue关键字
-    TK_BREAK,    //break关键字
-    TK_RETURN,   //return关键字
-    TK_SIZEOF,   //sizeof关键字
+    KW_CHAR,     //char关键字
+    KW_SHORT,    //short关键字
+    KW_INT,      //int关键字
+    KW_VOID,     //void关键字
+    KW_STRUCT,   //struct关键字
+    KW_IF,       //if关键字
+    KW_ELSE,     //else关键字
+    KW_FOR,      //for关键字
+    KW_CONTINUE, //continue关键字
+    KW_BREAK,    //break关键字
+    KW_RETURN,   //return关键字
+    KW_SIZEOF,   //sizeof关键字
 
-    TK_ALIGN,   //__align关键字
-    TK_CDECL,   //__cdecl关键字
-    TK_STDCALL, //__stdcall关键字
+    KW_ALIGN,   //__align关键字
+    KW_CDECL,   //__cdecl关键字
+    KW_STDCALL, //__stdcall关键字
 
     /*标识符*/
     TK_IDENT
