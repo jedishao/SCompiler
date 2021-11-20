@@ -516,16 +516,98 @@ void for_statement()
 {
     get_token();
     skip(TK_OPENPA);
-    if(token!=TK_SEMICOLON)
+    if (token != TK_SEMICOLON)
     {
         expression();
     }
     skip(TK_SEMICOLON);
-    if(token!=TK_CLOSEPA)
+    if (token != TK_CLOSEPA)
     {
         expression();
     }
-    syntax_state=SNTX_LF_HT;
+    syntax_state = SNTX_LF_HT;
     skip(TK_CLOSEPA);
     statement();
+}
+
+/*******************************************
+ * continue
+ * 
+ * <continue_statement>::=<KW_CONTINUE><TK_SEMICOLON>
+*******************************************/
+void contiune_statement()
+{
+    get_token();
+    syntax_state = SNTX_LF_HT;
+    skip(TK_SEMICOLON);
+}
+
+/*******************************************
+ * break
+ * 
+ * <break_statement>::=<KW_BREAK><TK_SEMICOLON>
+*******************************************/
+void break_statement()
+{
+    get_token();
+    syntax_state = SNTX_LF_HT;
+    skip(TK_SEMICOLON);
+}
+
+/*******************************************
+ * return
+ * 
+ * <return_statement>::=<KW_RETURN><TK_SEMICOLON>
+ *      |<KW_RETURN><expression><TK_SEMICOLON>
+*******************************************/
+void return_statement()
+{
+    syntax_state = SNTX_DELAY;
+    get_token();
+    if (token == TK_SEMICOLON) //适用于return;
+        syntax_state = SNTX_NUL;
+    else
+        syntax_state = SNTX_SP; //适用于return <expression>;
+    syntax_indent();
+
+    if (token != TK_SEMICOLON)
+        expression();
+    syntax_state = SNTX_LF_HT;
+    skip(TK_SEMICOLON);
+}
+
+/*******************************************
+ * expression
+ * 
+ * <expression>::=<assignment_expression>
+ *      {<TK_COMMA><assignment_expression>}
+*******************************************/
+void expression()
+{
+    while (1)
+    {
+        assignment_expression();
+        if (token != TK_COMMA)
+            break;
+        get_token();
+    }
+}
+
+/*******************************************
+ * 赋值表达式
+ * <assignment_expression>::=<equality_expression>
+ *      |<unary_expression><TK_ASSIGN><assignment_expression>
+ * 
+ * 非等价变换后:
+ * <assignment_expression>::=<equality_expression>
+ *      {<TK_ASSIGN>><assignment_expression>}
+*******************************************/
+void assignment_expression()
+{
+    equality_expression();
+    if (token == TK_ASSIGN)
+    {
+        get_token();
+        assignment_expression();
+    }
 }
