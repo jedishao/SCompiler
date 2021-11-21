@@ -191,7 +191,7 @@ void struct_declaration_list()
     {
         struct_declaration(&maxalign, &offset);
     }
-    skip(TK_END);
+    //skip(TK_END);
 
     syntax_state = SNTX_LF_HT;
 }
@@ -267,12 +267,12 @@ void struct_member_alignment()
 /*******************************************
  * 声明符
  * <declarator>::={<pointer>}[<function_calling_convention>]
- *   [<struct_member_alignment>]<direcr_declarator>
+ *   [<struct_member_alignment>]<direct_declarator>
  * <pointer>::=<TK_STAR>
  * 
  * 等价转换后:
  * <declarator>::={<TK_STAR>}[<function_calling_convention>]
- *   [<struct_member_alignment>]<direcr_declarator>
+ *   [<struct_member_alignment>]<direct_declarator>
  ********************************************/
 void declarator()
 {
@@ -308,7 +308,7 @@ void direct_declarator()
  *    |<TK_OPENPA><parameter_type_list><TK_CLOSEPA>
  *    |<TK_OPENPA><TK_CLOSEPA>}
 *******************************************/
-void direcr_declarator_postfix()
+void direct_declarator_postfix()
 {
     int n;
     if (token == TK_OPENPA)
@@ -324,7 +324,7 @@ void direcr_declarator_postfix()
             n = tkvalue;
         }
         skip(TK_CLOSEBR);
-        direcr_declarator_postfix();
+        direct_declarator_postfix();
     }
 }
 
@@ -535,7 +535,7 @@ void for_statement()
  * 
  * <continue_statement>::=<KW_CONTINUE><TK_SEMICOLON>
 *******************************************/
-void contiune_statement()
+void continue_statement()
 {
     get_token();
     syntax_state = SNTX_LF_HT;
@@ -837,16 +837,14 @@ void syntax_indent()
         color_token(LEX_NORMAL);
         break;
     case SNTX_SP:
-        print(" ");
+        printf(" ");
         color_token(LEX_NORMAL);
         break;
     case SNTX_LF_HT:
-    {
         if (token == TK_END)
             syntax_level--;
         printf("\n");
         print_tab(syntax_level);
-    }
         color_token(LEX_NORMAL);
         break;
     case SNTX_DELAY:
@@ -864,4 +862,23 @@ void print_tab(int n)
     int i=0;
     for(;i<n;i++)
         printf("\t");
+}
+
+int main(int argc, char **argv)
+{
+    fin = fopen(argv[1], "rb");
+    if (!fin)
+    {
+        printf("can not open the file!\n");
+        return 0;
+    }
+
+    init();
+    getch();
+    get_token();
+    translation_unit();
+    cleanup();
+    fclose(fin);
+    printf("\n%s success!\n", argv[1]);
+    return 1;
 }

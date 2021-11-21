@@ -214,7 +214,7 @@ void color_token(int lex_state)
     {
         if (token >= TK_IDENT) /*标识符灰色*/
             SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-        else if (token >= TK_CHAR) /*关键字为绿色*/
+        else if (token >= KW_CHAR) /*关键字为绿色*/
             SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
         else if (token >= TK_CINT) /*常量为黄色*/
             SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_RED);

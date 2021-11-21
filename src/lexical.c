@@ -521,30 +521,30 @@ void parse_string(char sep)
 /*******************************************
   * 功能:main主函数
  ********************************************/
-int main(int argc, char **argv)
-{
-    fin = fopen(argv[1], "rb");
-    if (!fin)
-    {
-        printf("can not open!\n");
-        return 0;
-    }
-    init();
+// int main(int argc, char **argv)
+// {
+//     fin = fopen(argv[1], "rb");
+//     if (!fin)
+//     {
+//         printf("can not open!\n");
+//         return 0;
+//     }
+//     init();
 
-    getch();
-    do
-    {
-        get_token();
-        color_token(LEX_NORMAL);
-    } while (token != TK_EOF);
+//     getch();
+//     do
+//     {
+//         get_token();
+//         color_token(LEX_NORMAL);
+//     } while (token != TK_EOF);
 
-    printf("\n line num:%d\n", line_num);
+//     printf("\n line num:%d\n", line_num);
 
-    cleanup();
-    fclose(fin);
-    printf("%ssucc", argv[1]);
-    return 1;
-}
+//     cleanup();
+//     fclose(fin);
+//     printf("%ssucc", argv[1]);
+//     return 1;
+// }
 
 /*******************************************
   * 功能:初始行
