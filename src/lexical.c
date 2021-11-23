@@ -496,9 +496,9 @@ void parse_string(char sep)
             default:
                 c = ch;
                 if (c >= '!' && c <= '~')
-                    warning("非法转义字符:\'\\%c\'", c);
+                    warning("Illegal escape character:\'\\%c\'", c);
                 else
-                    warning("非法转义字符:\'\\0x%x\'", c);
+                    warning("Illegal escape character:\'\\0x%x\'", c);
                 break;
             }
             dynstring_chcat(&tkstr, c);

@@ -3,16 +3,16 @@
 #include "..\head\utils.h"
 #include "..\head\syntax.h"
 
-/*è¯­æ³•åˆ†æ*/
+/*Óï·¨·ÖÎö*/
 
 /*
-syntax_state    ç”¨äºå†³å®šæ˜¯å¦æ¢è¡Œ
-syntax_level    æ§åˆ¶ç¼©è¿›çº§åˆ«   
+syntax_state    ÓÃÓÚ¾ö¶¨ÊÇ·ñ»»ĞĞ
+syntax_level    ¿ØÖÆËõ½ø¼¶±ğ   
 */
 
 /*******************************************
  * <translation_unit>::={<external_declaration>}<TK_EOF>
- * <ç¿»è¯‘å•å…ƒ>::={<å¤–éƒ¨å£°æ˜>}<æ–‡ä»¶ç»“æŸç¬¦>
+ * <·­Òëµ¥Ôª>::={<Íâ²¿ÉùÃ÷>}<ÎÄ¼ş½áÊø·û>
  ********************************************/
 void translation_unit()
 {
@@ -23,21 +23,21 @@ void translation_unit()
 }
 
 /*******************************************
- *  åŠŸèƒ½:è§£æå¤–éƒ¨å£°æ˜
- *  l:å­˜å‚¨ç±»å‹ï¼Œå±€éƒ¨çš„è¿˜æ˜¯å…¨å±€çš„
+ *  ¹¦ÄÜ:½âÎöÍâ²¿ÉùÃ÷
+ *  l:´æ´¢ÀàĞÍ£¬¾Ö²¿µÄ»¹ÊÇÈ«¾ÖµÄ
  * <external_declaration>::=<function_definition>|<declaration>
  * <function_definition>::=<type_specifier><declarator><funcbody>
  * <declaration>::=<type_specifier><TK_SEMICOLON>
  *      |<type_specifier><init_declarator_list><TK_SEMICOLON>
  * <init_declarator_list>::=<init_declarator>{<TK_COMMA><init_declarator>}
  * <init_declarator>::=<declarator>{<TK_ASSIGN><initializer>}
- * <å¤–éƒ¨å£°æ˜>::=<å‡½æ•°å®šä¹‰>|<å£°æ˜>
- * <å‡½æ•°å®šä¹‰>::=<ç±»å‹åŒºåˆ†ç¬¦><å£°æ˜ç¬¦><å‡½æ•°ä½“>
- * <å£°æ˜>::=<ç±»å‹åŒºåˆ†ç¬¦><åˆ†å·>|<ç±»å‹åŒºåˆ†ç¬¦><åˆå€¼å£°æ˜ç¬¦è¡¨><åˆ†å·>
- * <åˆå€¼å£°æ˜ç¬¦è¡¨>::=<åˆå€¼å£°æ˜ç¬¦>{<é€—å·><åˆå€¼å£°æ˜ç¬¦>}
- * <åˆå€¼å£°æ˜ç¬¦>::=<å£°æ˜ç¬¦>{<èµ‹å€¼è¿ç®—ç¬¦><åˆå€¼ç¬¦>}
+ * <Íâ²¿ÉùÃ÷>::=<º¯Êı¶¨Òå>|<ÉùÃ÷>
+ * <º¯Êı¶¨Òå>::=<ÀàĞÍÇø·Ö·û><ÉùÃ÷·û><º¯ÊıÌå>
+ * <ÉùÃ÷>::=<ÀàĞÍÇø·Ö·û><·ÖºÅ>|<ÀàĞÍÇø·Ö·û><³õÖµÉùÃ÷·û±í><·ÖºÅ>
+ * <³õÖµÉùÃ÷·û±í>::=<³õÖµÉùÃ÷·û>{<¶ººÅ><³õÖµÉùÃ÷·û>}
+ * <³õÖµÉùÃ÷·û>::=<ÉùÃ÷·û>{<¸³ÖµÔËËã·û><³õÖµ·û>}
  * 
- * ç­‰ä»·è½¬æ¢ä¸ºLL(1)æ–‡æ³•:
+ * µÈ¼Û×ª»»ÎªLL(1)ÎÄ·¨:
  * <external_declaration>::=
  *      <type_specifier>(<TK_SEMICOLON>
  *      |<declarator><funcbody>
@@ -48,7 +48,7 @@ void external_declaration(int l)
 {
     if (!type_specifier())
     {
-        expect("<ç±»å‹åŒºåˆ†ç¬¦>");
+        expect("<type>");
     }
 
     if (token == TK_SEMICOLON)
@@ -57,13 +57,13 @@ void external_declaration(int l)
         return;
     }
 
-    while (1) //é€ä¸ªåˆ†æå£°æ˜æˆ–å‡½æ•°å®šä¹‰
+    while (1) //Öğ¸ö·ÖÎöÉùÃ÷»òº¯Êı¶¨Òå
     {
         declarator();
         if (token == TK_BEGIN)
         {
             if (l == SC_LOCAL)
-                error("ä¸æ”¯æŒå‡½æ•°åµŒå¥—å®šä¹‰");
+                error("no nesting call");
             funcbody();
             break;
         }
@@ -87,11 +87,13 @@ void external_declaration(int l)
             }
         }
     }
+    // if(token==TK_SEMICOLON)
+    //     skip(TK_SEMICOLON);
 }
 
 /*******************************************
- *  åŠŸèƒ½:è§£æç±»å‹åŒºåˆ†ç¬¦
- *  è¿”å›å€¼:æ˜¯å¦å‘ç°åˆæ³•çš„ç±»å‹åŒºåˆ†ç¬¦
+ *  ¹¦ÄÜ:½âÎöÀàĞÍÇø·Ö·û
+ *  ·µ»ØÖµ:ÊÇ·ñ·¢ÏÖºÏ·¨µÄÀàĞÍÇø·Ö·û
  * 
  * <type_specifier>::=<KW_INT>
  *      |<TK_CHAR>
@@ -105,20 +107,8 @@ int type_specifier()
     switch (token)
     {
     case KW_CHAR:
-        type_found = 1;
-        syntax_state = SNTX_SP;
-        get_token();
-        break;
     case KW_SHORT:
-        type_found = 1;
-        syntax_state = SNTX_SP;
-        get_token();
-        break;
     case KW_VOID:
-        type_found = 1;
-        syntax_state = SNTX_SP;
-        get_token();
-        break;
     case KW_INT:
         type_found = 1;
         syntax_state = SNTX_SP;
@@ -127,7 +117,8 @@ int type_specifier()
     case KW_STRUCT:
         type_found = 1;
         syntax_state = SNTX_SP;
-        get_token();
+        struct_specifier();
+        //get_token();
         break;
     default:
         break;
@@ -136,14 +127,14 @@ int type_specifier()
 }
 
 /*******************************************
- * ç»“æ„åŒºåˆ†ç¬¦
+ * ½á¹¹Çø·Ö·û
  * 
  * <struct_specifier>::=
  *      <TK_STRUCT><IDENTIFIER><TK_BEGIN>
  *      <struct_declaration_list><TK_END>|
  *      <TK_STRUCT><IDENTIFIER>
- * <ç»“æ„åŒºåˆ†ç¬¦>::=<structå…³é”®å­—><æ ‡è¯†ç¬¦>|
- *      <structå…³é”®å­—><æ ‡è¯†ç¬¦><å·¦å¤§æ‹¬å·><ç»“æ„å£°æ˜è¡¨><å³å¤§æ‹¬å·>
+ * <½á¹¹Çø·Ö·û>::=<struct¹Ø¼ü×Ö><±êÊ¶·û>|
+ *      <struct¹Ø¼ü×Ö><±êÊ¶·û><×ó´óÀ¨ºÅ><½á¹¹ÉùÃ÷±í><ÓÒ´óÀ¨ºÅ>
  ********************************************/
 void struct_specifier()
 {
@@ -151,18 +142,18 @@ void struct_specifier()
     get_token();
     v = token;
 
-    syntax_state = SNTX_DELAY; //å»¶è¿Ÿåˆ°å–å‡ºä¸‹ä¸€ä¸ªå•è¯åç¡®å®šè¾“å‡ºæ ¼å¼
+    syntax_state = SNTX_DELAY; //ÑÓ³Ùµ½È¡³öÏÂÒ»¸öµ¥´ÊºóÈ·¶¨Êä³ö¸ñÊ½
     get_token();
 
-    if (token == TK_BEGIN) //é€‚ç”¨äºç»“æ„ä½“å®šä¹‰
+    if (token == TK_BEGIN) //ÊÊÓÃÓÚ½á¹¹Ìå¶¨Òå
         syntax_state = SNTX_LF_HT;
-    else if (token == TK_CLOSEPA) //é€‚ç”¨äºsizeof(struct struct_name)
+    else if (token == TK_CLOSEPA) //ÊÊÓÃÓÚsizeof(struct struct_name)
         syntax_state = SNTX_NUL;
-    else //é€‚ç”¨äºç»“æ„å˜é‡å£°æ˜
+    else //ÊÊÓÃÓÚ½á¹¹±äÁ¿ÉùÃ÷
         syntax_state = SNTX_SP;
     syntax_indent();
 
-    if (v < TK_IDENT) //å…³é”®å­—ä¸èƒ½ä½œä¸ºç»“æ„åç§°
+    if (v < TK_IDENT) //¹Ø¼ü×Ö²»ÄÜ×÷Îª½á¹¹Ãû³Æ
         expect("struct");
 
     if (token == TK_BEGIN)
@@ -172,42 +163,43 @@ void struct_specifier()
 }
 
 /*******************************************
- * ç»“æ„å£°æ˜è¡¨
+ * ½á¹¹ÉùÃ÷±í
  * 
  * <struct_declaration_list>::=
  *      <struct_declaration>{<struct_declaration>}
- * <ç»“æ„å£°æ˜è¡¨>::=
- *      <ç»“æ„å£°æ˜>{<ç»“æ„å£°æ˜>}
+ * <½á¹¹ÉùÃ÷±í>::=
+ *      <½á¹¹ÉùÃ÷>{<½á¹¹ÉùÃ÷>}
  ********************************************/
 void struct_declaration_list()
 {
-    int maxalign, offset;
+    //int maxalign, offset;
 
-    syntax_state = SNTX_LF_HT; //ç¬¬ä¸€ä¸ªç»“æ„ä½“æˆå‘˜ä¸'{'ä¸å†™åœ¨ä¸€è¡Œ
-    syntax_level++;            //ç»“æ„ä½“æˆå‘˜å˜é‡å£°æ˜ï¼Œç¼©è¿›å¢åŠ ä¸€çº§
+    syntax_state = SNTX_LF_HT; //µÚÒ»¸ö½á¹¹Ìå³ÉÔ±Óë'{'²»Ğ´ÔÚÒ»ĞĞ
+    syntax_level++;            //½á¹¹Ìå³ÉÔ±±äÁ¿ÉùÃ÷£¬Ëõ½øÔö¼ÓÒ»¼¶
 
     get_token();
     while (token != TK_END)
     {
-        struct_declaration(&maxalign, &offset);
+        struct_declaration();
+        //struct_declaration(&maxalign, &offset);
     }
-    //skip(TK_END);
+    skip(TK_END);
 
     syntax_state = SNTX_LF_HT;
 }
 
 /*******************************************
- * ç»“æ„å£°æ˜
+ * ½á¹¹ÉùÃ÷
  * 
  * <struct_declaration>::=
  *      <type_specifier><struct_declarator_list><TK_SEMICOLON>*
  * <struct_declarator_list>::=<declarator>{<TK_COMMA><declarator>}
  * 
- * ç­‰ä»·è½¬æ¢å:
+ * µÈ¼Û×ª»»ºó:
  * <struct_declaration>::=
  *      <type_specifier><declarator>{<TK_COMMA><declarator>}
  *      <TK_SEMICOLON>
- * <ç»“æ„å£°æ˜>::=<ç±»å‹åŒºåˆ†ç¬¦><å£°æ˜ç¬¦>{<é€—å·><å£°æ˜ç¬¦>}<åˆ†å·>
+ * <½á¹¹ÉùÃ÷>::=<ÀàĞÍÇø·Ö·û><ÉùÃ÷·û>{<¶ººÅ><ÉùÃ÷·û>}<·ÖºÅ>
  ********************************************/
 void struct_declaration()
 {
@@ -226,8 +218,8 @@ void struct_declaration()
 
 /*******************************************
  *<function_calling_convention>::=<TK_CDECL>|<TK_STDCALL>
- *<è°ƒç”¨çº¦å®š>::=<__cdeclå…³é”®å­—>|<__stdcallå…³é”®å­—>
- *ç”¨äºå‡½æ•°å£°æ˜ä¸Šï¼Œç”¨åœ¨æ•°æ®å£°æ˜ä¸Šå¿½ç•¥æ‰
+ *<µ÷ÓÃÔ¼¶¨>::=<__cdecl¹Ø¼ü×Ö>|<__stdcall¹Ø¼ü×Ö>
+ *ÓÃÓÚº¯ÊıÉùÃ÷ÉÏ£¬ÓÃÔÚÊı¾İÉùÃ÷ÉÏºöÂÔµô
  ********************************************/
 void function_calling_convention(int *fc)
 {
@@ -241,12 +233,12 @@ void function_calling_convention(int *fc)
 }
 
 /*******************************************
- * ç»“æ„æˆå‘˜å¯¹é½
+ * ½á¹¹³ÉÔ±¶ÔÆë
  * 
  * <struct_member_alignment>::=<TK_ALIGN><TK_OPENPA>
  *            <TK_CLINET><TK_CLOSEPA>
- * <ç»“æ„æˆå‘˜å¯¹é½>::=<__alignå…³é”®å­—><å·¦å°æ‹¬å·>
- *            <æ•´æ•°å¸¸é‡><å³å°æ‹¬å·>
+ * <½á¹¹³ÉÔ±¶ÔÆë>::=<__align¹Ø¼ü×Ö><×óĞ¡À¨ºÅ>
+ *            <ÕûÊı³£Á¿><ÓÒĞ¡À¨ºÅ>
  ********************************************/
 void struct_member_alignment()
 {
@@ -265,12 +257,12 @@ void struct_member_alignment()
 }
 
 /*******************************************
- * å£°æ˜ç¬¦
+ * ÉùÃ÷·û
  * <declarator>::={<pointer>}[<function_calling_convention>]
  *   [<struct_member_alignment>]<direct_declarator>
  * <pointer>::=<TK_STAR>
  * 
- * ç­‰ä»·è½¬æ¢å:
+ * µÈ¼Û×ª»»ºó:
  * <declarator>::={<TK_STAR>}[<function_calling_convention>]
  *   [<struct_member_alignment>]<direct_declarator>
  ********************************************/
@@ -287,7 +279,7 @@ void declarator()
 }
 
 /*******************************************
- * ç›´æ¥å£°æ˜ç¬¦
+ * Ö±½ÓÉùÃ÷·û
  * <direct_declarator>::=<IDENTIFIER><direct_declarator_postfix>
 *******************************************/
 void direct_declarator()
@@ -302,7 +294,7 @@ void direct_declarator()
 }
 
 /*******************************************
- * ç›´æ¥å£°æ˜ç¬¦åç¼€
+ * Ö±½ÓÉùÃ÷·ûºó×º
  * <direct_declarator_postfix>::={<TK_OPENBR><TK_CINT><TK_CLOSEBR>
  *    |<TK_OPENBR><TK_CLOSEBR>
  *    |<TK_OPENPA><parameter_type_list><TK_CLOSEPA>
@@ -329,8 +321,8 @@ void direct_declarator_postfix()
 }
 
 /*******************************************
- * åŠŸèƒ½:è§£æå½¢å‚ç±»å‹è¡¨
- * func_call:å‡½æ•°è°ƒç”¨çº¦å®š
+ * ¹¦ÄÜ:½âÎöĞÎ²ÎÀàĞÍ±í
+ * func_call:º¯Êıµ÷ÓÃÔ¼¶¨
  * 
  * <parameter_type_list>::=<parameter_list>
  *    |<parameter_list><TK_COMMA><TK_ELLIPSIS>
@@ -338,7 +330,7 @@ void direct_declarator_postfix()
  *    {<TK_COMMA><parameter_declaration>}
  * <parameter_declaration>::=<type_specifier>{<declarator>}
  * 
- * ç­‰ä»·è½¬æ¢å:
+ * µÈ¼Û×ª»»ºó:
  * <parameter_type_list>::=<type_specifier>{<declarator>}
  *    {<TK_COMMA><type_specifier>{<declarator>}}<TK_COMMA><TK_ELLIPSIS>
  ********************************************/
@@ -364,15 +356,15 @@ void parameter_type_list(int func_call)
     }
     syntax_state = SNTX_DELAY;
     skip(TK_CLOSEPA);
-    if (token == TK_BEGIN) //å‡½æ•°å®šä¹‰
+    if (token == TK_BEGIN) //º¯Êı¶¨Òå
         syntax_state = SNTX_LF_HT;
-    else //å‡½æ•°å£°æ˜
+    else //º¯ÊıÉùÃ÷
         syntax_state = SNTX_NUL;
     syntax_indent();
 }
 
 /*******************************************
- * å‡½æ•°ä½“
+ * º¯ÊıÌå
  * <funcbody>::=<compound_statement>
 *******************************************/
 void funcbody()
@@ -381,7 +373,7 @@ void funcbody()
 }
 
 /*******************************************
- * åˆå€¼ç¬¦
+ * ³õÖµ·û
  * <initializer>::=<assignment_expression>
 *******************************************/
 void initializer()
@@ -390,7 +382,7 @@ void initializer()
 }
 
 /*******************************************
- * è¯­å¥
+ * Óï¾ä
  * <statement>::=<compound_statement>
  *     |<if_statement>
  *     |<return_statement>
@@ -428,14 +420,14 @@ void statement()
 }
 
 /*******************************************
- * å¤åˆè¯­å¥
+ * ¸´ºÏÓï¾ä
  * <compound_statement>::=<TK_BEGIN>{<delaration>}
  *           {<statement>}<TK_END>
 *******************************************/
 void compound_statement()
 {
     syntax_state = SNTX_LF_HT;
-    syntax_level++; //å¤åˆè¯­å¥ï¼Œç¼©è¿›å¢åŠ ä¸€çº§
+    syntax_level++; //¸´ºÏÓï¾ä£¬Ëõ½øÔö¼ÓÒ»¼¶
 
     get_token();
     while (is_type_specifier(token))
@@ -452,8 +444,8 @@ void compound_statement()
 }
 
 /*******************************************
- * åŠŸèƒ½:åˆ¤æ–­æ˜¯å¦ä¸ºç±»å‹åŒºåˆ†ç¬¦
- * v: å•è¯ç¼–ç 
+ * ¹¦ÄÜ:ÅĞ¶ÏÊÇ·ñÎªÀàĞÍÇø·Ö·û
+ * v: µ¥´Ê±àÂë
 *******************************************/
 int is_type_specifier(int v)
 {
@@ -472,7 +464,7 @@ int is_type_specifier(int v)
 }
 
 /*******************************************
- * è¡¨è¾¾å¼è¯­å¥
+ * ±í´ïÊ½Óï¾ä
  * <expression_statement>::=<TK_SEMICOLON>|
  *             <expression><TK_SEMICOLON>
 *******************************************/
@@ -487,7 +479,7 @@ void expression_statement()
 }
 
 /*******************************************
- * æ¡ä»¶åˆ¤æ–­
+ * Ìõ¼şÅĞ¶Ï
  * 
  * <if_statement>::=<KW_IF><TK_OPENPA><expression>
  *      <TK_CLOSEPA><statement>[<KW_ELSE><statement>]
@@ -507,7 +499,7 @@ void if_statement()
 }
 
 /*******************************************
- * forå¾ªç¯
+ * forÑ­»·
  * 
  * <for_statement>::=<KW_FOR><TK_OPENPA><expression_statement>
  *      <expression_statement><expression><TK_CLOSEPA><statement>
@@ -531,7 +523,7 @@ void for_statement()
 }
 
 /*******************************************
- * continue è¯­ä¹‰ä¸Šå­˜åœ¨é—®é¢˜
+ * continue ÓïÒåÉÏ´æÔÚÎÊÌâ
  * 
  * <continue_statement>::=<KW_CONTINUE><TK_SEMICOLON>
 *******************************************/
@@ -564,10 +556,10 @@ void return_statement()
 {
     syntax_state = SNTX_DELAY;
     get_token();
-    if (token == TK_SEMICOLON) //é€‚ç”¨äºreturn;
+    if (token == TK_SEMICOLON) //ÊÊÓÃÓÚreturn;
         syntax_state = SNTX_NUL;
     else
-        syntax_state = SNTX_SP; //é€‚ç”¨äºreturn <expression>;
+        syntax_state = SNTX_SP; //ÊÊÓÃÓÚreturn <expression>;
     syntax_indent();
 
     if (token != TK_SEMICOLON)
@@ -594,11 +586,11 @@ void expression()
 }
 
 /*******************************************
- * èµ‹å€¼è¡¨è¾¾å¼
+ * ¸³Öµ±í´ïÊ½
  * <assignment_expression>::=<equality_expression>
  *      |<unary_expression><TK_ASSIGN><assignment_expression>
  * 
- * éç­‰ä»·å˜æ¢å:(è¯­ä¹‰ä¸Šå­˜åœ¨é—®é¢˜)
+ * ·ÇµÈ¼Û±ä»»ºó:(ÓïÒåÉÏ´æÔÚÎÊÌâ)
  * <assignment_expression>::=<equality_expression>
  *      {<TK_ASSIGN>><assignment_expression>}
 *******************************************/
@@ -613,7 +605,7 @@ void assignment_expression()
 }
 
 /*******************************************
- * ç›¸ç­‰ç±»è¡¨è¾¾å¼
+ * ÏàµÈÀà±í´ïÊ½
  * 
  * <equality_expression>::=<relational_expression>
  *      {<TK_EQ><relational_expression>
@@ -630,7 +622,7 @@ void equality_expression()
 }
 
 /*******************************************
- * å…³ç³»ç±»è¡¨è¾¾å¼
+ * ¹ØÏµÀà±í´ïÊ½
  * 
  * <relational_expression>::=<additive_expression>
  *      {<TK_LT><additive_expression>
@@ -650,7 +642,7 @@ void relational_expression()
 }
 
 /*******************************************
- * åŠ å‡ç±»è¡¨è¾¾å¼
+ * ¼Ó¼õÀà±í´ïÊ½
  * 
  * <additive_expression>::=<multiplication_expression>
  *      {<TK_PLUS><multiplication_expression>
@@ -667,7 +659,7 @@ void additive_expression()
 }
 
 /*******************************************
- * ä¹˜é™¤ç±»è¡¨è¾¾å¼
+ * ³Ë³ıÀà±í´ïÊ½
  * 
  * <multiplication_expression>::=<unary_expression>
  *      {<TK_STAR><unary_expression>
@@ -685,7 +677,7 @@ void multiplication_expression()
 }
 
 /*******************************************
- * ä¸€å…ƒç±»è¡¨è¾¾å¼
+ * Ò»ÔªÀà±í´ïÊ½
  * 
  * <unary_expression>::=<postfix_expression>
  *      |<TK_AND><unary_expression>
@@ -738,7 +730,7 @@ void sizeof_expression()
 }
 
 /*******************************************
- * åç¼€è¡¨è¾¾å¼
+ * ºó×º±í´ïÊ½
  * 
  * <postfix_expression>::=<primary_expression>
  *      {<TK_OPENBR><expression><TK_CLOSEBR>
@@ -772,7 +764,7 @@ void postfix_expression()
 }
 
 /*******************************************
- * åˆå€¼è¡¨è¾¾å¼
+ * ³õÖµ±í´ïÊ½
  * 
  * <primary_expression>::=<IDENTIFIER>
  *      |<TK_CINT>
@@ -805,7 +797,7 @@ void primary_expression()
 }
 
 /*******************************************
- * å®å‚è¡¨è¾¾å¼è¡¨
+ * Êµ²Î±í´ïÊ½±í
  * 
  * <argument_expression_list>::=<argument_expression>
  *      {<TK_COMMA><assignment_expression>}
@@ -827,9 +819,10 @@ void argument_expression_list()
 }
 
 /*******************************************
- * åŠŸèƒ½: è¯­æ³•ç¼©è¿›
+ * ¹¦ÄÜ: Óï·¨Ëõ½ø
 *******************************************/
-void syntax_indent()
+void 
+syntax_indent()
 {
     switch (syntax_state)
     {
@@ -854,8 +847,8 @@ void syntax_indent()
 }
 
 /*******************************************
- * åŠŸèƒ½: ç¼©è¿›nä¸ªtab
- * n:    ç¼©è¿›ä¸ªæ•°
+ * ¹¦ÄÜ: Ëõ½øn¸ötab
+ * n:    Ëõ½ø¸öÊı
 *******************************************/
 void print_tab(int n)
 {
@@ -866,7 +859,7 @@ void print_tab(int n)
 
 int main(int argc, char **argv)
 {
-    fin = fopen(argv[1], "rb");
+    fin = fopen("C:/C/SCompiler/src/syntest.c", "rb");
     if (!fin)
     {
         printf("can not open the file!\n");
