@@ -495,6 +495,9 @@ void if_statement()
     statement();
     if (token == KW_ELSE)
     {
+        syntax_state=SNTX_LF_HT;
+        get_token();
+        statement();
     }
 }
 
@@ -508,6 +511,11 @@ void for_statement()
 {
     get_token();
     skip(TK_OPENPA);
+    if (token != TK_SEMICOLON)
+    {
+        expression();
+    }
+    skip(TK_SEMICOLON);
     if (token != TK_SEMICOLON)
     {
         expression();
