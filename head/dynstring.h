@@ -1,12 +1,12 @@
 #pragma once
 
 
-/*åŠ¨æ€å­—ç¬¦ä¸²ï¼Œå­˜å‚¨å•è¯*/
+/*¶¯Ì¬×Ö·û´®£¬´æ´¢µ¥´Ê*/
 typedef struct DynString
 {
-    int count;    //å­—ç¬¦ä¸²é•¿åº¦
-    int capacity; //åŒ…å«è¯¥å­—ç¬¦ä¸²çš„ç¼“å†²åŒºé•¿åº¦
-    char *data;   //æŒ‡å‘å­—ç¬¦ä¸²çš„æŒ‡é’ˆ
+    int count;    //×Ö·û´®³¤¶È
+    int capacity; //°üº¬¸Ã×Ö·û´®µÄ»º³åÇø³¤¶È
+    char *data;   //Ö¸Ïò×Ö·û´®µÄÖ¸Õë
 } DynString;
 
 void dynstring_init(DynString *pstr, int initsize);

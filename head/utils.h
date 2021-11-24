@@ -10,20 +10,20 @@
 #include "dynstring.h"
 
 
-/*å•è¯å­˜å‚¨ç»“æž„å®šä¹‰*/
+/*µ¥´Ê´æ´¢½á¹¹¶¨Òå*/
 typedef struct TKWord
 {
-    int tkcode;                    //å•è¯ç¼–ç 
-    struct TKWord *next;           //æŒ‡å‘å“ˆå¸Œå†²çªçš„åŒä¹‰è¯
-    char *spelling;                //å•è¯å­—ç¬¦ä¸²
-    struct Symbol *sym_struct;     //æŒ‡å‘å•è¯æ‰€è¡¨ç¤ºçš„ç»“æž„å®šä¹‰
-    struct Symbol *sym_identifier; //æŒ‡å‘å•è¯æ‰€è¡¨ç¤ºçš„æ ‡è¯†ç¬¦
+    int tkcode;                    //µ¥´Ê±àÂë
+    struct TKWord *next;           //Ö¸Ïò¹þÏ£³åÍ»µÄÍ¬Òå´Ê
+    char *spelling;                //µ¥´Ê×Ö·û´®
+    struct Symbol *sym_struct;     //Ö¸Ïòµ¥´ÊËù±íÊ¾µÄ½á¹¹¶¨Òå
+    struct Symbol *sym_identifier; //Ö¸Ïòµ¥´ÊËù±íÊ¾µÄ±êÊ¶·û
 }TKWord;
 
 
-#define MAXKEY 1024           //å“ˆå¸Œè¡¨å®¹é‡
-TKWord *tk_hashtable[MAXKEY]; //å•è¯å“ˆå¸Œè¡¨
-DynArray tktable;             //å•è¯è¡¨
+#define MAXKEY 1024           //¹þÏ£±íÈÝÁ¿
+TKWord *tk_hashtable[MAXKEY]; //µ¥´Ê¹þÏ£±í
+DynArray tktable;             //µ¥´Ê±í
 
 
 int token;
@@ -33,82 +33,82 @@ FILE *fin;
 char* filename;
 int line_num;
 
-DynString tkstr,sourcestr; //å•è¯å­—ç¬¦ä¸², å•è¯æºç å­—ç¬¦ä¸²
+DynString tkstr,sourcestr; //µ¥´Ê×Ö·û´®, µ¥´ÊÔ´Âë×Ö·û´®
 int tkvalue;
 
-/*å•è¯ç¼–ç */
+/*µ¥´Ê±àÂë*/
 enum e_Token_Code
 {
-    /*è¿ç®—ç¬¦åŠåˆ†éš”ç¬¦*/
-    TK_PLUS,      //+åŠ å·
-    TK_MINUS,     //-å‡å·
-    TK_STAR,      //*æ˜Ÿå·
-    TK_DIVIDE,    ///é™¤å·
-    TK_MOD,       //%æ±‚ä½™è¿ç®—ç¬¦
-    TK_EQ,        //==ç­‰äºŽå·
-    TK_NEQ,       //ï¼=ä¸ç­‰äºŽ
-    TK_LT,        //<å°äºŽå·
-    TK_LEQ,       //<=å°äºŽç­‰äºŽ
-    TK_GT,        //>å¤§äºŽ
-    TK_GEQ,       //>=å¤§äºŽç­‰äºŽ
-    TK_ASSIGN,    //=èµ‹å€¼è¿ç®—ç¬¦
-    TK_POINTSTO,  //->æŒ‡å‘ç»“æž„ä½“æˆå‘˜è¿ç®—ç¬¦
-    TK_DOT,       //.ç»“æž„ä½“æˆå‘˜è¿ç®—ç¬¦
-    TK_AND,       //&åœ°å€ä¸Žè¿ç®—ç¬¦
-    TK_OPENPA,    //(å·¦åœ†æ‹¬å·
-    TK_CLOSEPA,   //)å³åœ†æ‹¬å·
-    TK_OPENBR,    //[å·¦ä¸­æ‹¬å·
-    TK_CLOSEBR,   //]å³ä¸­æ‹¬å·
-    TK_BEGIN,     //{å·¦å¤§æ‹¬å·
-    TK_END,       //}å³å¤§æ‹¬å·
-    TK_SEMICOLON, //;åˆ†å·
-    TK_COMMA,     //,é€—å·
-    TK_ELLIPSIS,  //...çœç•¥å·
-    TK_EOF,       //æ–‡ä»¶ç»“æŸç¬¦
+    /*ÔËËã·û¼°·Ö¸ô·û*/
+    TK_PLUS,      //+¼ÓºÅ
+    TK_MINUS,     //-¼õºÅ
+    TK_STAR,      //*ÐÇºÅ
+    TK_DIVIDE,    ///³ýºÅ
+    TK_MOD,       //%ÇóÓàÔËËã·û
+    TK_EQ,        //==µÈÓÚºÅ
+    TK_NEQ,       //£¡=²»µÈÓÚ
+    TK_LT,        //<Ð¡ÓÚºÅ
+    TK_LEQ,       //<=Ð¡ÓÚµÈÓÚ
+    TK_GT,        //>´óÓÚ
+    TK_GEQ,       //>=´óÓÚµÈÓÚ
+    TK_ASSIGN,    //=¸³ÖµÔËËã·û
+    TK_POINTSTO,  //->Ö¸Ïò½á¹¹Ìå³ÉÔ±ÔËËã·û
+    TK_DOT,       //.½á¹¹Ìå³ÉÔ±ÔËËã·û
+    TK_AND,       //&µØÖ·ÓëÔËËã·û
+    TK_OPENPA,    //(×óÔ²À¨ºÅ
+    TK_CLOSEPA,   //)ÓÒÔ²À¨ºÅ
+    TK_OPENBR,    //[×óÖÐÀ¨ºÅ
+    TK_CLOSEBR,   //]ÓÒÖÐÀ¨ºÅ
+    TK_BEGIN,     //{×ó´óÀ¨ºÅ
+    TK_END,       //}ÓÒ´óÀ¨ºÅ
+    TK_SEMICOLON, //;·ÖºÅ
+    TK_COMMA,     //,¶ººÅ
+    TK_ELLIPSIS,  //...Ê¡ÂÔºÅ
+    TK_EOF,       //ÎÄ¼þ½áÊø·û
 
-    /*å¸¸é‡*/
-    TK_CINT,  //æ•´åž‹å¸¸é‡
-    TK_CCHAR, //å­—ç¬¦å¸¸é‡
-    TK_CSTR,   //å­—ç¬¦ä¸²å¸¸é‡
+    /*³£Á¿*/
+    TK_CINT,  //ÕûÐÍ³£Á¿
+    TK_CCHAR, //×Ö·û³£Á¿
+    TK_CSTR,   //×Ö·û´®³£Á¿
 
-    /*å…³é”®å­—*/
-    KW_CHAR,     //charå…³é”®å­—
-    KW_SHORT,    //shortå…³é”®å­—
-    KW_INT,      //intå…³é”®å­—
-    KW_VOID,     //voidå…³é”®å­—
-    KW_STRUCT,   //structå…³é”®å­—
-    KW_IF,       //ifå…³é”®å­—
-    KW_ELSE,     //elseå…³é”®å­—
-    KW_FOR,      //forå…³é”®å­—
-    KW_CONTINUE, //continueå…³é”®å­—
-    KW_BREAK,    //breakå…³é”®å­—
-    KW_RETURN,   //returnå…³é”®å­—
-    KW_SIZEOF,   //sizeofå…³é”®å­—
+    /*¹Ø¼ü×Ö*/
+    KW_CHAR,     //char¹Ø¼ü×Ö
+    KW_SHORT,    //short¹Ø¼ü×Ö
+    KW_INT,      //int¹Ø¼ü×Ö
+    KW_VOID,     //void¹Ø¼ü×Ö
+    KW_STRUCT,   //struct¹Ø¼ü×Ö
+    KW_IF,       //if¹Ø¼ü×Ö
+    KW_ELSE,     //else¹Ø¼ü×Ö
+    KW_FOR,      //for¹Ø¼ü×Ö
+    KW_CONTINUE, //continue¹Ø¼ü×Ö
+    KW_BREAK,    //break¹Ø¼ü×Ö
+    KW_RETURN,   //return¹Ø¼ü×Ö
+    KW_SIZEOF,   //sizeof¹Ø¼ü×Ö
 
-    KW_ALIGN,   //__alignå…³é”®å­—
-    KW_CDECL,   //__cdeclå…³é”®å­—
-    KW_STDCALL, //__stdcallå…³é”®å­—
+    KW_ALIGN,   //__align¹Ø¼ü×Ö
+    KW_CDECL,   //__cdecl¹Ø¼ü×Ö
+    KW_STDCALL, //__stdcall¹Ø¼ü×Ö
 
-    /*æ ‡è¯†ç¬¦*/
+    /*±êÊ¶·û*/
     TK_IDENT
 };
 
-/*è¯æ³•çŠ¶æ€æžšä¸¾å®šä¹‰*/								
+/*´Ê·¨×´Ì¬Ã¶¾Ù¶¨Òå*/								
 enum e_LexState
 {
 	LEX_NORMAL,
 	LEX_SEP
 };
 
-/*é”™è¯¯å¤„ç†ç¨‹åºç”¨åˆ°çš„æžšä¸¾å®šä¹‰*/
-/*é”™è¯¯çº§åˆ«*/
+/*´íÎó´¦Àí³ÌÐòÓÃµ½µÄÃ¶¾Ù¶¨Òå*/
+/*´íÎó¼¶±ð*/
 enum e_ErrorLevel
 {
     LEVEL_WARNING,
     LEVEL_ERROR,
 };
 
-/*å·¥ä½œé˜¶æ®µ*/
+/*¹¤×÷½×¶Î*/
 enum e_WorkStage
 {
     STAGE_COMPILE,

@@ -1,11 +1,11 @@
 #pragma once
 
-/*åŠ¨æ€æ•°ç»„å®šä¹‰*/
+/*¶¯Ì¬Êı×é¶¨Òå*/
 typedef struct DynArray
 {
-    int count;    //åŠ¨æ€æ•°ç»„å…ƒç´ ä¸ªæ•°
-    int capacity; //åŠ¨æ€æ•°ç»„ç¼“å†²åŒºé•¿åº¦
-    void **data;  //æŒ‡å‘æ•°æ®æŒ‡é’ˆæ•°ç»„
+    int count;    //¶¯Ì¬Êı×éÔªËØ¸öÊı
+    int capacity; //¶¯Ì¬Êı×é»º³åÇø³¤¶È
+    void **data;  //Ö¸ÏòÊı¾İÖ¸ÕëÊı×é
 } DynArray;
 
 void dynarray_realloc(DynArray *parr, int new_size);
