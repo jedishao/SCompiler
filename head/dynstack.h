@@ -7,8 +7,6 @@ typedef struct Stack
 	int stacksize; //栈当前可使用的最大容量, 以元素个数计
 } Stack;
 
-Stack global_sym_stack, local_sym_stack;
-
 void stack_init(Stack *stack, int initsize);
 void *stack_push(Stack *stack, void *element, int size);
 void stack_pop(Stack *stack);
