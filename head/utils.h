@@ -9,7 +9,6 @@
 #include "dynarray.h"
 #include "dynstring.h"
 
-
 /*单词存储结构定义*/
 typedef struct TKWord
 {
@@ -18,22 +17,20 @@ typedef struct TKWord
     char *spelling;                //单词字符串
     struct Symbol *sym_struct;     //指向单词所表示的结构定义
     struct Symbol *sym_identifier; //指向单词所表示的标识符
-}TKWord;
-
+} TKWord;
 
 #define MAXKEY 1024           //哈希表容量
 TKWord *tk_hashtable[MAXKEY]; //单词哈希表
 DynArray tktable;             //单词表
 
-
 int token;
 char ch;
 FILE *fin;
 
-char* filename;
+char *filename;
 int line_num;
 
-DynString tkstr,sourcestr; //单词字符串, 单词源码字符串
+DynString tkstr, sourcestr; //单词字符串, 单词源码字符串
 int tkvalue;
 
 /*单词编码*/
@@ -69,7 +66,7 @@ enum e_Token_Code
     /*常量*/
     TK_CINT,  //整型常量
     TK_CCHAR, //字符常量
-    TK_CSTR,   //字符串常量
+    TK_CSTR,  //字符串常量
 
     /*关键字*/
     KW_CHAR,     //char关键字
@@ -93,11 +90,11 @@ enum e_Token_Code
     TK_IDENT
 };
 
-/*词法状态枚举定义*/								
+/*词法状态枚举定义*/
 enum e_LexState
 {
-	LEX_NORMAL,
-	LEX_SEP
+    LEX_NORMAL,
+    LEX_SEP
 };
 
 /*错误处理程序用到的枚举定义*/
@@ -116,19 +113,20 @@ enum e_WorkStage
 };
 
 int elf_hash(char *key);
-void* mallocz(int size);
-TKWord* tkword_direct_insert(TKWord *tp);
-TKWord* tkword_find(char *p, int keyno);
-TKWord* tkword_insert(char *p);
+void *mallocz(int size);
+TKWord *tkword_direct_insert(TKWord *tp);
+TKWord *tkword_find(char *p, int keyno);
+TKWord *tkword_insert(char *p);
 void color_token(int lex_state);
 void handle_exception(int stage, int level, char *fmt, va_list ap);
 void warning(char *fmt, ...);
 void error(char *fmt, ...);
-void expect(char* msg);
-char* get_tkstr(int v);
+void expect(char *msg);
+char *get_tkstr(int v);
 void skip(int c);
 void link_error(char *fmt, ...);
 void init();
 void cleanup();
+int calc_slign(int n, int align);
 
 #endif // _UTILS_H

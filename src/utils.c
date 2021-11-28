@@ -229,3 +229,13 @@ void color_token(int lex_state)
         break;
     }
 }
+
+/*******************************************
+  * 功能:   计算字节对齐位置
+  * n:      未对齐前值
+  * align:  对齐粒度
+ ********************************************/
+int calc_slign(int n, int align)
+{
+    return ((n+align-1)&(~(align-1)));
+}
