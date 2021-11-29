@@ -235,7 +235,7 @@ void color_token(int lex_state)
   * n:      未对齐前值
   * align:  对齐粒度
  ********************************************/
-int calc_slign(int n, int align)
+int calc_align(int n, int align)
 {
     return ((n+align-1)&(~(align-1)));
 }

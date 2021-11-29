@@ -125,8 +125,8 @@ void expect(char *msg);
 char *get_tkstr(int v);
 void skip(int c);
 void link_error(char *fmt, ...);
-void init();
-void cleanup();
-int calc_slign(int n, int align);
+// void init();
+// void cleanup();
+int calc_align(int n, int align);
 
 #endif // _UTILS_H
