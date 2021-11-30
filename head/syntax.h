@@ -1,7 +1,10 @@
 #ifndef _GRAMMER_H
 #define _GRAMMER_H
-
+#define ALIGN_SET 0x100
 #include "lexical.h"
+#include "utils.h"
+#include "type.h"
+#include "symbol.h"
 
 int syntax_state; 	//语法状态
 int syntax_level; 	//缩进级别
@@ -22,17 +25,17 @@ enum e_Filed
 
 void translation_unit();
 void external_declaration(int l);
-int type_specifier();
-void struct_specifier();
-void struct_declaration_list();
-void struct_declaration();
+int type_specifier(Type *type);
+void struct_specifier(Type *type);
+void struct_declaration_list(Type *type);
+void struct_declaration(int *maxalign, int *offset, Symbol ***ps);
+void struct_member_alignment(int *force_align);
 void function_calling_convention(int *fc);
-void struct_member_alignment();
-void declarator();
-void direct_declarator();
-void direct_declarator_postfix();
-void parameter_type_list();
-void funcbody();
+void declarator(Type *type, int *v, int *force_align);
+void direct_declarator(Type *type, int *v, int func_call);
+void direct_declarator_postfix(Type *type, int func_call);
+void parameter_type_list(Type *type, int func_call);
+void funcbody(Symbol *sym);
 void initializer();
 void statement();
 void compound_statement();
